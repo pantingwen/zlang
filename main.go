@@ -20,20 +20,23 @@ func main() {
 				return;
 			}
 			fileName = os.Args[2]
-			fileContent, err := ioutil.ReadFile(fileName)
-			if err != nil {
-				panic(err)
-			}
-			sourceCode := string(fileContent)
-			switch operation {
-				case "run":
-					cli.RunSourceCode(sourceCode)
-					return
-				case "build":
-					cli.BuildSourceCode(sourceCode)
+		}	else {
+			operation = "run"
+			fileName = os.Args[1]
+		}
+		fileContent, err := ioutil.ReadFile(fileName)
+		if err != nil {
+			panic(err)
+		}
+		sourceCode := string(fileContent)
+		switch operation {
+			case "run":
+				cli.RunSourceCode(sourceCode)
 				return
-			}
-		}	
+			case "build":
+				cli.BuildSourceCode(sourceCode)
+			return
+		}
 	}
 	user, err := user.Current()
 	if err != nil {
