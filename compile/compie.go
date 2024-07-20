@@ -2,9 +2,9 @@ package compile
 
 import (
 	"fmt"
-	"monkey/ast"
-	"monkey/code"
-	"monkey/object"
+	"z/ast"
+	"z/code"
+	"z/object"
 	"sort"
 )
 

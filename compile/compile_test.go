@@ -2,11 +2,11 @@ package compile
 
 import (
 	"fmt"
-	"monkey/ast"
-	"monkey/code"
-	"monkey/lexer"
-	"monkey/object"
-	"monkey/parser"
+	"z/ast"
+	"z/code"
+	"z/lexer"
+	"z/object"
+	"z/parser"
 	"testing"
 )
 

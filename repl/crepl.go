@@ -6,11 +6,12 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"monkey/compile"
-	"monkey/lexer"
-	"monkey/object"
-	"monkey/parser"
-	"monkey/vm"
+	"z/compile"
+	"z/lexer"
+	"z/object"
+	"z/parser"
+	"z/vm"
+	"z/util"
 )
 
 func CStart(in io.Reader, out io.Writer) {
@@ -38,7 +39,7 @@ func CStart(in io.Reader, out io.Writer) {
 		program := p.ParseProgram()
 
 		if len(p.Errors()) != 0 {
-			printParserErrors(out, p.Errors())
+			util.PrintErrors(out, p.Errors())
 			continue
 		}
 

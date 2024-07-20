@@ -2,11 +2,11 @@ package vm
 
 import (
 	"fmt"
-	"monkey/ast"
-	"monkey/compile"
-	"monkey/lexer"
-	"monkey/object"
-	"monkey/parser"
+	"z/ast"
+	"z/compile"
+	"z/lexer"
+	"z/object"
+	"z/parser"
 	"testing"
 )
 

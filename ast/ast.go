@@ -3,7 +3,7 @@ package ast
 import (
 	"bytes"
 	"fmt"
-	"monkey/token"
+	"z/token"
 	"strings"
 )
 

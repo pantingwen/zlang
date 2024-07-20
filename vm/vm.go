@@ -2,9 +2,9 @@ package vm
 
 import (
 	"fmt"
-	"monkey/code"
-	"monkey/compile"
-	"monkey/object"
+	"z/code"
+	"z/compile"
+	"z/object"
 )
 
 const StackSize = 2048

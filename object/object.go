@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"hash/fnv"
-	"monkey/ast"
-	"monkey/code"
+	"z/ast"
+	"z/code"
 	"strings"
 )
 

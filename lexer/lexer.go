@@ -1,6 +1,6 @@
 package lexer
 
-import "monkey/token"
+import "z/token"
 
 type Lexer struct {
 	input       string // 输入的字符串
