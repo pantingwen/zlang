@@ -9,5 +9,5 @@ let fibonacci = fn(x) {
 		}
 	}
 };
-let result = fibonacci(5);
+let result = fibonacci(10);
 puts("result is:", result, "\n");
