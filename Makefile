@@ -1,4 +1,4 @@
 z: z
-	go build
+	go build -o dist/z
 clean:
-	rm -rf z
+	rm -rf dist/z; rm -rf *.c

@@ -1,1 +1,1 @@
-puts("hello world", "\n")
+puts("hello world\n");

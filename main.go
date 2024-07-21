@@ -34,7 +34,7 @@ func main() {
 				cli.RunSourceCode(sourceCode)
 				return
 			case "build":
-				cli.BuildSourceCode(sourceCode)
+				cli.BuildSourceCode(sourceCode, fileName)
 			return
 		}
 	}
@@ -42,6 +42,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Welcome to z language , user is: ", user.Username)
+	fmt.Println("Welcome to z language , user is: ", user.Username, " type code to execute")
 	repl.CStart(os.Stdin, os.Stdout)
 }

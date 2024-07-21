@@ -1,2 +1,2 @@
-let name = "pantingwen"
-puts(name, "\n")
+let name = "pantingwen";
+puts(name, "\n");
