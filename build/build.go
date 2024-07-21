@@ -39,7 +39,6 @@ func Eval(node ast.Node, env *object.Environment) string {
 	// 	fmt.Println("pre...")
 	// 	return evalPrefixExpression(node.Operator, right)
 	case *ast.Identifier:
-		fmt.Println("idt ....")
 		return node.Value;
 	// case *ast.InfixExpression:
 	// 	left := Eval(node.Left, env)
@@ -66,7 +65,6 @@ func Eval(node ast.Node, env *object.Environment) string {
 	case *ast.FunctionLiteral:
 		return node.Name
 	case *ast.CallExpression:
-		fmt.Println("call ....")
 		function := Eval(node.Function, env)
 		callString := ""
 		switch function {
@@ -89,7 +87,6 @@ func Eval(node ast.Node, env *object.Environment) string {
 		return callString
 
 	case *ast.StringLiteral:
-		fmt.Println("string....")
 		return string("\"" + node.Value + "\"")
 	// case *ast.ArrayLiteral:
 	// 	elements := evalExpressions(node.Elements, env)

@@ -28,7 +28,6 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	case *ast.Boolean:
 		return nativeBoolToBooleanObject(node.Value)
 	case *ast.LetStatement:
-		fmt.Println("let ...")
 		val := Eval(node.Value, env)
 		env.Set(node.Name.Value, val)
 		return val
@@ -37,10 +36,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		if isError(right) {
 			return right
 		}
-		fmt.Println("pre...")
 		return evalPrefixExpression(node.Operator, right)
 	case *ast.Identifier:
-		fmt.Println("idt ....")
 		return evalIdentifier(node, env)
 	case *ast.InfixExpression:
 		left := Eval(node.Left, env)
@@ -69,7 +66,6 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		body := node.Body
 		return &object.Function{Parameters: params, Env: env, Body: body}
 	case *ast.CallExpression:
-		fmt.Println("call ....")
 		function := Eval(node.Function, env)
 		if isError(function) {
 			return function
@@ -82,7 +78,6 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 		return applyFunction(function, args)
 	case *ast.StringLiteral:
-		fmt.Println("string....")
 		return &object.String{Value: node.Value}
 	case *ast.ArrayLiteral:
 		elements := evalExpressions(node.Elements, env)

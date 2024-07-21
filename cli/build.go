@@ -11,15 +11,19 @@ import (
 	"z/object"
 	"z/ast"
 	"z/build"
+	"time"
 )
 
 func BuildSourceCode(sourceCode string, sourceFile string) {
+	var duration time.Duration
+	start := time.Now()
 	fmt.Println("begin to build code")
 	compiledCode := parseAstToC(sourceCode)
-	fmt.Println(compiledCode)
 	fileName := filepath.Base(sourceFile)
 	outFileName := strings.TrimSuffix(fileName, filepath.Ext(fileName))
 	compileC(compiledCode, outFileName)
+	duration = time.Since(start)
+	fmt.Printf("build execute time is :%s\n", duration)
 }
 
 func parseAstToC(sourceCode string) string {
@@ -27,7 +31,6 @@ func parseAstToC(sourceCode string) string {
 	p := parser.New(l)
 	program := p.ParseProgram()
 	env := object.NewEnvironment()
-	//compiledCode := generateCode(program, env)
 	compiledCode := generateProgram(program, env);
 	return compiledCode
 }
@@ -72,7 +75,6 @@ func generateProgram(program *ast.Program, env *object.Environment) string {
 	var generateCompiledCode string;
 	var compiledCode string;
 	for _, statement := range program.Statements {
-		fmt.Println("statement:" + statement.String())
 		code := build.Eval(statement, env)
 		compiledCode = compiledCode + code
 	}
@@ -94,10 +96,11 @@ func compileC(code string, outFile string) {
 	_, err = file.WriteString(code)
 	file.Close()
 	cmd := exec.Command("gcc", tempFileName, "-o", outFile)
-	stdout, err := cmd.Output()
+	_, err = cmd.Output()
 	if err != nil {
 		fmt.Println(err.Error())
+	} else {
+		fmt.Println("build success!")
 	}
-	fmt.Println(string(stdout))
 	os.Remove(tempFileName)
 }
