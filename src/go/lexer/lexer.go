@@ -68,14 +68,24 @@ func (l *Lexer) NextToken() token.Token {
 	case '*':
 		tok = newToken(token.ASTERISK, l.ch)
 	case '/':
-		if l.peekChar() == '/' {
+		if l.peekChar() == '/'  {
 			l.readChar()
-			for  {
+			for { // single line anntation
 				l.readChar()
 				ch := l.ch
 				if (ch == 10) {
 					return l.NextToken()
-					break;
+				}
+			}
+		} else if l.peekChar() == '*' { // multiple lines annotation begin with /* end with */
+			l.readChar()
+			for {
+				l.readChar()
+				ch := l.ch
+				if (ch == '*' && l.peekChar() == '/') {
+					l.readChar() // use readChar twice lose */ char
+					l.readChar()
+					return l.NextToken()
 				}
 			}
 		} else {

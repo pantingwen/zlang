@@ -3,3 +3,9 @@ puts("anotation learn", "\n")
 
 // this is another anotation
 puts("new line learn", "\n")
+
+/*
+ multiple line anotation
+*/
+
+puts("xx", "\n")
