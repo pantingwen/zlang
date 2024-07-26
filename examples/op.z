@@ -7,3 +7,6 @@ puts("c is:", c, "\n");
 let d = b - a;
 
 puts("d is:", d, "\n");
+
+let e = d / 3
+puts("e is:", e, "\n")
