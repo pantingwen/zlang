@@ -3,12 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"monkey/compile"
-	"monkey/evaluator"
-	"monkey/lexer"
-	"monkey/object"
-	"monkey/parser"
-	"monkey/vm"
+	"z/compile"
+	"z/evaluator"
+	"z/lexer"
+	"z/object"
+	"z/parser"
+	"z/vm"
 	"time"
 )
 
