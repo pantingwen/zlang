@@ -325,3 +325,18 @@ func (hl *HashLiteral) String() string {
 
 	return out.String()
 }
+
+type ImportStatement struct {
+	Token      token.Token
+	Statements []Statement
+}
+
+func (bs *ImportStatement) expressionNode()      {}
+func (bs *ImportStatement) TokenLiteral() string { return bs.Token.Literal }
+func (bs *ImportStatement) String() string {
+	var out bytes.Buffer
+	for _, s := range bs.Statements {
+		out.WriteString(s.String())
+	}
+	return out.String()
+}

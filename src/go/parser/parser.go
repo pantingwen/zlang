@@ -4,6 +4,8 @@ package parser
 
 import (
 	"fmt"
+	"os"
+	"io/ioutil"
 	"z/ast"
 	"z/lexer"
 	"z/token"
@@ -103,16 +105,37 @@ func (p *Parser) ParseProgram() *ast.Program {
 	program.Statements = []ast.Statement{}
 
 	for p.curToken.Type != token.EOF {
-		stmt := p.parseStatement()
-
-		if stmt != nil {
-			program.Statements = append(program.Statements, stmt)
+		if (p.curToken.Type == token.IMPORT) {
+			p.parseImportFile(program, p.peekToken.Literal)
+		} else {
+			stmt := p.parseStatement()
+			if stmt != nil {
+				program.Statements = append(program.Statements, stmt)
+			}
 		}
-
 		p.nextToken()
 	}
 
 	return program
+}
+
+func (p *Parser) parseImportFile(program *ast.Program, fileName string) {
+	if _, err := os.Stat(fileName); err != nil {
+		if os.IsNotExist(err) {
+			fmt.Println("import file not exists: " + fileName)
+			os.Exit(1)
+		}
+	}
+	importCode, err := ioutil.ReadFile(p.peekToken.Literal)
+	if err != nil {
+		panic(err)
+	}
+	importLexer  := lexer.New(string(importCode))
+	importParser := New(importLexer)
+	importProgram := importParser.ParseProgram()
+	for _, stmt := range importProgram.Statements {
+		program.Statements = append(program.Statements, stmt)
+	}
 }
 
 func (p *Parser) parseStatement() ast.Statement {

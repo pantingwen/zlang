@@ -14,6 +14,7 @@ func TestLetStatements(t *testing.T) {
 let x = 5;
 let y = 10;
 let foobar = 34;
+let name = "sevenpan";
 `
 
 	l := lexer.New(input)
@@ -24,8 +25,8 @@ let foobar = 34;
 	if program == nil {
 		t.Fatalf("ParseProgram() returned nil")
 	}
-	if len(program.Statements) != 3 {
-		t.Fatalf("program.Statements does not contain 3 statements. got=%d",
+	if len(program.Statements) != 4 {
+		t.Fatalf("program.Statements does not contain 4 statements. got=%d",
 			len(program.Statements))
 	}
 
@@ -35,6 +36,7 @@ let foobar = 34;
 		{"x"},
 		{"y"},
 		{"foobar"},
+		{"name"},
 	}
 	for i, tt := range tests {
 		stmt := program.Statements[i]

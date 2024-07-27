@@ -87,6 +87,10 @@ func (l *Lexer) NextToken() token.Token {
 					l.readChar()
 					return l.NextToken()
 				}
+				if (ch == 0) { // find */ until the last of file
+					l.readChar()
+					return l.NextToken()
+				}
 			}
 		} else {
 			tok = newToken(token.SLASH, l.ch)
@@ -144,9 +148,13 @@ func newToken(TokenType token.TokenType, ch byte) token.Token {
 }
 
 func (l *Lexer) skipWhiteSpace() {
-	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
+	for l.isWhiteSpace(l.ch) {
 		l.readChar()
 	}
+}
+
+func (l *Lexer) isWhiteSpace(ch byte) bool{
+	return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r'
 }
 
 func (l *Lexer) readNumber() string {
