@@ -1,0 +1,6 @@
+import "let.z"
+import "child.z"
+
+puts("import test", "\n")
+
+puts(child, " ", grandson, "\n")
