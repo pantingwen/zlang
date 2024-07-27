@@ -69,7 +69,7 @@ func (c *Compile) Compile(node ast.Node) error {
 			c.emit(code.OpPop)
 		}
 	case *ast.InfixExpression:
-		if node.Operator == "<" {
+		if node.Operator == "<" || node.Operator == "<=" {
 			err := c.Compile(node.Right)
 			if err != nil {
 				return err
@@ -79,7 +79,11 @@ func (c *Compile) Compile(node ast.Node) error {
 			if err != nil {
 				return err
 			}
-			c.emit(code.OpGreaterThan)
+			if (node.Operator == "<") {
+				c.emit(code.OpGreaterThan)
+			} else {
+				c.emit(code.OpGreaterEqual)
+			}
 			return nil
 		}
 		err := c.Compile(node.Left)
@@ -101,6 +105,8 @@ func (c *Compile) Compile(node ast.Node) error {
 			c.emit(code.OpDiv)
 		case ">":
 			c.emit(code.OpGreaterThan)
+		case ">=":
+			c.emit(code.OpGreaterEqual)
 		case "==":
 			c.emit(code.OpEqual)
 		case "!=":

@@ -96,9 +96,21 @@ func (l *Lexer) NextToken() token.Token {
 			tok = newToken(token.SLASH, l.ch)
 		}
 	case '<':
-		tok = newToken(token.LT, l.ch)
+		if (l.peekChar() == '=') {
+			tok.Type = token.LE
+			tok.Literal = l.input[l.position:l.position + 2]
+			l.readChar()
+		} else {
+			tok = newToken(token.LT, l.ch)
+		}
 	case '>':
-		tok = newToken(token.GT, l.ch)
+		if (l.peekChar() == '=') {
+			tok.Type = token.GE
+			tok.Literal = l.input[l.position:l.position + 2]
+			l.readChar()
+		} else {
+			tok = newToken(token.GT, l.ch)
+		}
 	case '[':
 		tok = newToken(token.LBRACKET, l.ch)
 	case ']':

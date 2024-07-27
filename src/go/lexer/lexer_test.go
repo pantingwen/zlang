@@ -35,6 +35,8 @@ if (5  < 10) {
 /* annotation */
 // this is annotation
 import "package/include_file.z";
+>=;
+<=;
 `
 
 	tests := []struct {
@@ -132,6 +134,10 @@ import "package/include_file.z";
 		{token.SEMICOLON, ";"},
 		{token.IMPORT, "import"},
 		{token.STRING, "package/include_file.z"},
+		{token.SEMICOLON, ";"},
+		{token.GE, ">="},
+		{token.SEMICOLON, ";"},
+		{token.LE, "<="},
 		{token.SEMICOLON, ";"},
 		{token.EOF, ""},
 	}

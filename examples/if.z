@@ -1,0 +1,11 @@
+let age = 34;
+let old_age = 35;
+if (age >= old_age) {
+  puts("you are too old", "\n");
+} else {
+  puts("you can do it", "\n");
+}
+
+if (2 > 1) {
+  puts("2 > 1 ", 2 > 1, "\n")
+}
