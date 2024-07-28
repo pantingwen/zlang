@@ -1,0 +1,8 @@
+let a = 100;
+let c = 0;
+puts("c is", c, "\n")
+while (a > 0) {
+  c = c + a;
+  a = a - 1;
+}
+puts("c is: ", c, "\n")

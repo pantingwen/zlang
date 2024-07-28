@@ -10,3 +10,7 @@ puts("d is:", d, "\n");
 
 let e = d / 3
 puts("e is:", e, "\n")
+
+let f = e + 1
+let f = e + 1
+puts("f is:", f, "\n")
