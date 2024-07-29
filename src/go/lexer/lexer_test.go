@@ -37,6 +37,8 @@ if (5  < 10) {
 import "package/include_file.z";
 >=;
 <=;
+while (2 > 1) {x};
+a = b + 1;
 `
 
 	tests := []struct {
@@ -138,6 +140,22 @@ import "package/include_file.z";
 		{token.GE, ">="},
 		{token.SEMICOLON, ";"},
 		{token.LE, "<="},
+		{token.SEMICOLON, ";"},
+		{token.WHILE, "while"},
+		{token.LPAREN, "("},
+		{token.INT, "2"},
+		{token.GT, ">"},
+		{token.INT, "1"},
+		{token.RPAREN, ")"},
+		{token.LBRACE, "{"},
+		{token.IDENT, "x"},
+		{token.RBRACE, "}"},
+		{token.SEMICOLON, ";"},
+		{token.IDENT, "a"},
+		{token.ASSIGN, "="},
+		{token.IDENT, "b"},
+		{token.PLUS, "+"},
+		{token.INT, "1"},
 		{token.SEMICOLON, ";"},
 		{token.EOF, ""},
 	}

@@ -51,6 +51,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalInfixExpression(node.Operator, left, right)
 	case *ast.IfExpression:
 		return evalIfExpression(node, env)
+	case *ast.WhileExpression:
+		return evalWhileExpression(node, env)
 	case *ast.BlockStatement:
 		return evalBlockStatement(node, env)
 	case *ast.IntegerLiteral:
@@ -97,6 +99,14 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalIndexExpression(left, index)
 	case *ast.HashLiteral:
 		return evalHashLiteral(node, env)
+	case *ast.AssignExpression:
+		val := Eval(node.Value, env)
+		_, ok := env.Get(node.Name.Value)
+		if !ok {
+			return newError("variable " + node.Name.Value + " not found")
+		}
+		env.Set(node.Name.Value, val)
+		return val
 	}
 	return nil
 }
@@ -223,6 +233,21 @@ func evalIfExpression(ie *ast.IfExpression, env *object.Environment) object.Obje
 	}
 }
 
+func evalWhileExpression(we *ast.WhileExpression, env *object.Environment) object.Object {
+	condition := Eval(we.Condition, env)
+	if isError(condition) {
+	}
+
+	for isTruthy(condition) {
+		bodyResult := Eval(we.Body, env)
+		condition := Eval(we.Condition, env)
+		if !isTruthy(condition) {
+			return bodyResult
+		}
+	}
+	return NULL
+}
+
 func isTruthy(obj object.Object) bool {
 	switch obj {
 	case NULL:
@@ -279,7 +304,7 @@ func evalIntegerInfixExpression(operator string, left object.Object, right objec
 	case "<":
 		return nativeBoolToBooleanObject(leftVal < rightVal)
 	case ">":
-		return nativeBoolToBooleanObject(leftVal > rightVal)	
+		return nativeBoolToBooleanObject(leftVal > rightVal)
 	case "<=":
 		return nativeBoolToBooleanObject(leftVal <= rightVal)
 	case ">=":

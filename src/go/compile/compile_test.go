@@ -2,12 +2,12 @@ package compile
 
 import (
 	"fmt"
+	"testing"
 	"z/ast"
 	"z/code"
 	"z/lexer"
 	"z/object"
 	"z/parser"
-	"testing"
 )
 
 type compileTestCase struct {
@@ -983,7 +983,7 @@ func runCompileTests(t *testing.T, tests []compileTestCase) {
 			t.Fatalf("testInstructions failed: %s", err)
 		}
 
-		err = testConstants(t, tt.expectedConstants, bytecode.Constants)
+		err = testConstants(tt.expectedConstants, bytecode.Constants)
 
 		if err != nil {
 			t.Fatalf("testConstants failed: %s", err)
@@ -1005,7 +1005,7 @@ func testInstructions(expected []code.Instructions, actual code.Instructions) er
 	return nil
 }
 
-func testConstants(t *testing.T, expected []interface{}, actual []object.Object) error {
+func testConstants(expected []interface{}, actual []object.Object) error {
 	if len(expected) != len(actual) {
 		return fmt.Errorf("wrong number of constants. got=%d, want=%d", len(actual), len(expected))
 	}

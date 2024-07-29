@@ -22,6 +22,7 @@ const (
 	RETURN   = "RETURN"
 	STRING   = "STRING"
 	IMPORT   = "IMPORT"
+	WHILE    = "WHILE"
 
 	ASSIGN   = "="
 	PLUS     = "+"
@@ -60,6 +61,7 @@ var keywords = map[string]TokenType{
 	"else":   ELSE,
 	"return": RETURN,
 	"import": IMPORT,
+	"while":  WHILE,
 }
 
 func LookIndent(indent string) TokenType {

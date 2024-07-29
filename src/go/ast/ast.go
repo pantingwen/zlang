@@ -3,8 +3,8 @@ package ast
 import (
 	"bytes"
 	"fmt"
-	"z/token"
 	"strings"
+	"z/token"
 )
 
 type Node interface {
@@ -338,5 +338,42 @@ func (bs *ImportStatement) String() string {
 	for _, s := range bs.Statements {
 		out.WriteString(s.String())
 	}
+	return out.String()
+}
+
+type AssignExpression struct {
+	Token token.Token
+	Name  *Identifier
+	Value Expression
+}
+
+func (ae *AssignExpression) expressionNode()      {}
+func (ae *AssignExpression) TokenLiteral() string { return ae.Token.Literal }
+func (ae *AssignExpression) String() string {
+	var out bytes.Buffer
+	out.WriteString(ae.TokenLiteral() + " ")
+	out.WriteString(ae.Name.String())
+	out.WriteString(" = ")
+	if ae.Value != nil {
+		out.WriteString(ae.Value.String())
+	}
+	out.WriteString(";")
+	return out.String()
+}
+
+type WhileExpression struct {
+	Token     token.Token
+	Condition Expression
+	Body      *BlockStatement
+}
+
+func (we *WhileExpression) expressionNode()      {}
+func (we *WhileExpression) TokenLiteral() string { return we.Token.Literal }
+func (we *WhileExpression) String() string {
+	var out bytes.Buffer
+	out.WriteString("while")
+	out.WriteString(we.Condition.String())
+	out.WriteString(" ")
+	out.WriteString(we.Body.String())
 	return out.String()
 }

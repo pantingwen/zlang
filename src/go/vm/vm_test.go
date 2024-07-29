@@ -2,12 +2,12 @@ package vm
 
 import (
 	"fmt"
+	"testing"
 	"z/ast"
 	"z/compile"
 	"z/lexer"
 	"z/object"
 	"z/parser"
-	"testing"
 )
 
 type vmTestCase struct {

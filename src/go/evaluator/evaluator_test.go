@@ -1,10 +1,10 @@
 package evaluator
 
 import (
+	"testing"
 	"z/lexer"
 	"z/object"
 	"z/parser"
-	"testing"
 )
 
 func TestEvalIntegerExpression(t *testing.T) {
@@ -95,6 +95,7 @@ func TestLetStatements(t *testing.T) {
 		{"let a = 5; a", 5},
 		{"let a = 5 * 5; a;", 25},
 		{"let a = 5; let b = a; let c = a + b + 5;", 15},
+		{"let a = 2; a = a + 1;", 3},
 	}
 
 	for _, tt := range tests {
@@ -116,6 +117,23 @@ func TestIfElseExpression(t *testing.T) {
 		{"if (1 < 2) { 10; } else { 20; }", 10},
 	}
 
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		integer, ok := tt.expected.(int)
+		if ok {
+			testIntegerObject(t, evaluated, int64(integer))
+		} else {
+			testNullObject(t, evaluated)
+		}
+	}
+}
+
+func TestWhileStatement(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{"let a = 0; while(a<10) {a = a +1 ;}; a;", 10}}
 	for _, tt := range tests {
 		evaluated := testEval(tt.input)
 		integer, ok := tt.expected.(int)

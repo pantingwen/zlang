@@ -1,20 +1,21 @@
 package cli
 
-import "fmt"
-
-import "z/lexer"
-import "z/parser"
-import "z/compile"
-import "z/vm"
-import "z/evaluator"
-import "z/object"
+import (
+	"fmt"
+	"z/compile"
+	"z/evaluator"
+	"z/lexer"
+	"z/object"
+	"z/parser"
+	"z/vm"
+)
 
 func RunSourceCode(sourceCode string, mode string) {
 	l := lexer.New(sourceCode)
 	p := parser.New(l)
 	program := p.ParseProgram()
 
-	if mode == "vm" {
+	if mode != "vm" {
 		comp := compile.New()
 		err := comp.Compile(program)
 		if err != nil {

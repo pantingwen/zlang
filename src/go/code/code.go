@@ -42,6 +42,7 @@ const (
 	OpClosure
 	OpGetFree
 	OpCurrentClosure
+	OpWhile
 )
 
 type Defination struct {

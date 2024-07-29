@@ -5,11 +5,10 @@ package parser
 import (
 	"fmt"
 	"os"
-	"io/ioutil"
+	"strconv"
 	"z/ast"
 	"z/lexer"
 	"z/token"
-	"strconv"
 )
 
 type (
@@ -91,6 +90,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)
 	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
 	p.registerPrefix(token.LBRACE, p.parseHashLiteral)
+	p.registerPrefix(token.WHILE, p.parseWhileExpression)
 	return p
 }
 
@@ -109,7 +109,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 	program.Statements = []ast.Statement{}
 
 	for p.curToken.Type != token.EOF {
-		if (p.curToken.Type == token.IMPORT) {
+		if p.curToken.Type == token.IMPORT {
 			p.parseImportFile(program, p.peekToken.Literal)
 		} else {
 			stmt := p.parseStatement()
@@ -130,11 +130,11 @@ func (p *Parser) parseImportFile(program *ast.Program, fileName string) {
 			os.Exit(1)
 		}
 	}
-	importCode, err := ioutil.ReadFile(p.peekToken.Literal)
+	importCode, err := os.ReadFile(p.peekToken.Literal)
 	if err != nil {
 		panic(err)
 	}
-	importLexer  := lexer.New(string(importCode))
+	importLexer := lexer.New(string(importCode))
 	importParser := New(importLexer)
 	importProgram := importParser.ParseProgram()
 	for _, stmt := range importProgram.Statements {
@@ -223,7 +223,22 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 }
 
 func (p *Parser) parseInditifier() ast.Expression {
-	return &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+	identifier := &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+	if !p.peekTokenIs(token.ASSIGN) {
+		return identifier
+	}
+	stmt := &ast.AssignExpression{Token: p.curToken, Name: identifier}
+	p.nextToken()
+	p.nextToken()
+	stmt.Value = p.parseExpression(LOWEST)
+
+	if fl, ok := stmt.Value.(*ast.FunctionLiteral); ok {
+		fl.Name = stmt.Name.Value
+	}
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+	return stmt
 }
 
 func (p *Parser) parseIntegerLiteral() ast.Expression {
@@ -295,6 +310,23 @@ func (p *Parser) parseIfExpression() ast.Expression {
 		}
 		expression.Alternative = p.parseBlockStatement()
 	}
+	return expression
+}
+
+func (p *Parser) parseWhileExpression() ast.Expression {
+	expression := &ast.WhileExpression{}
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+	p.nextToken()
+	expression.Condition = p.parseExpression(LOWEST)
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+	expression.Body = p.parseBlockStatement()
 	return expression
 }
 
@@ -448,7 +480,7 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 }
 
 func (p *Parser) peekError(t token.TokenType) {
-	msg := fmt.Sprintf("expected netxt token to be %s, got %s instead", t, p.peekToken.Type)
+	msg := fmt.Sprintf("expected next token to be %s, got %s instead", t, p.peekToken.Type)
 	p.errors = append(p.errors, msg)
 }
 

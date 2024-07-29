@@ -2,10 +2,10 @@ package compile
 
 import (
 	"fmt"
+	"sort"
 	"z/ast"
 	"z/code"
 	"z/object"
-	"sort"
 )
 
 type EmittedInstruction struct {
@@ -79,7 +79,7 @@ func (c *Compile) Compile(node ast.Node) error {
 			if err != nil {
 				return err
 			}
-			if (node.Operator == "<") {
+			if node.Operator == "<" {
 				c.emit(code.OpGreaterThan)
 			} else {
 				c.emit(code.OpGreaterEqual)
@@ -290,6 +290,35 @@ func (c *Compile) Compile(node ast.Node) error {
 			}
 		}
 		c.emit(code.OpCall, len(node.Arguments))
+	case *ast.AssignExpression:
+		symbol, ok := c.symbolTable.Resolve(node.Name.Value)
+		if !ok {
+			return fmt.Errorf("undefined variable %s \n", node.Name.Value)
+		}
+		err := c.Compile(node.Value)
+		if err != nil {
+			return err
+		}
+		if symbol.Scope == GlobalScope {
+			c.emit(code.OpSetGlobal, symbol.Index)
+		} else {
+			c.emit(code.OpSetLocal, symbol.Index)
+		}
+	case *ast.WhileExpression:
+		err := c.Compile(node.Condition)
+		if err != nil {
+			return err
+		}
+		jumpNotTruthyPos := c.emit(code.OpJumpNotTruthy, 9999)
+		err = c.Compile(node.Body)
+		if err != nil {
+			return err
+		}
+		if c.lastInstructionIs(code.OpPop) {
+			c.removeLastPop()
+		}
+		afterConsequancePos := len(c.currentInstructions())
+		c.changeOperand(jumpNotTruthyPos, afterConsequancePos)
 	}
 	return nil
 }

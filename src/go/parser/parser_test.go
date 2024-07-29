@@ -4,17 +4,18 @@ package parser
 
 import (
 	"fmt"
+	"testing"
 	"z/ast"
 	"z/lexer"
-	"testing"
 )
 
 func TestLetStatements(t *testing.T) {
 	input := `
 let x = 5;
-let y = 10;
+let y = x + 5;
 let foobar = 34;
 let name = "sevenpan";
+y = y + 1;
 `
 
 	l := lexer.New(input)
@@ -25,8 +26,8 @@ let name = "sevenpan";
 	if program == nil {
 		t.Fatalf("ParseProgram() returned nil")
 	}
-	if len(program.Statements) != 4 {
-		t.Fatalf("program.Statements does not contain 4 statements. got=%d",
+	if len(program.Statements) != 5 {
+		t.Fatalf("program.Statements does not contain 5 statements. got=%d",
 			len(program.Statements))
 	}
 
@@ -330,7 +331,41 @@ func TestBoolExpression(t *testing.T) {
 		}
 	}
 }
+func TestWhileExpression(t *testing.T) {
+	input := "while (x < y) {x}"
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
 
+	fmt.Println(len(program.Statements))
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program.Statements does not contain %d statement, got=%d", 1, len(program.Statements))
+	}
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement, got=%T", program.Statements[0])
+	}
+	exp, ok := stmt.Expression.(*ast.WhileExpression)
+	if !ok {
+		t.Fatalf("stmt.Expression is not While expression")
+	}
+	if !testInfixExpression(t, exp.Condition, "x", "<", "y") {
+		return
+	}
+	if len(exp.Body.Statements) != 1 {
+		t.Fatalf("exp.Body.Statements len is not 1, got=%d", len(exp.Body.Statements))
+	}
+	body, ok := exp.Body.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("exp.body.Statement[0] is not ast.ExpressionStatement")
+	}
+
+	if !testIdentifier(t, body.Expression, "x") {
+		return
+	}
+}
 func TestIfExpression(t *testing.T) {
 	input := `if (x < y) {x}`
 	l := lexer.New(input)
@@ -596,7 +631,7 @@ func TestParsingIndexExpression(t *testing.T) {
 
 	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
 	if !ok {
-		t.Fatalf("exp not *ast.ExpressionStatement, got=%T", stmt.Expression)
+		t.Fatalf("exp not *ast.ExpressionStatement")
 	}
 
 	indexExp, ok := stmt.Expression.(*ast.IndexExpression)
