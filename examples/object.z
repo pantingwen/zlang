@@ -1,0 +1,9 @@
+let person = {
+  "name": "jack",
+  "age": 33,
+  "sex": "male"
+}
+
+puts("person:", person["name"], "\n")
+puts("age:", person["age"], "\n")
+puts("age:", person["sex"], "\n")
