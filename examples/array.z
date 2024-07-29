@@ -1,0 +1,7 @@
+let names = ["jack", "tony", "sevenpan"]
+let index = 0
+while (index < len(names)) {
+  let name = names[index]
+  puts("current name is:", name, "\n")
+  index = index + 1;
+}
