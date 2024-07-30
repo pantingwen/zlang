@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"strings"
 	"z/compile"
 	"z/evaluator"
 	"z/lexer"
@@ -10,11 +11,13 @@ import (
 	"z/vm"
 )
 
-func RunSourceCode(sourceCode string, mode string) {
+func RunSourceCode(sourceCode string, mode string, fileName string) {
 	l := lexer.New(sourceCode)
 	p := parser.New(l)
+	filePaths := strings.Split(fileName, "/")
+	runSourceDir := strings.Join(filePaths[0:len(filePaths)-1], "/")
+	p.SetRunSourceDir(runSourceDir)
 	program := p.ParseProgram()
-
 	if mode != "vm" {
 		comp := compile.New()
 		err := comp.Compile(program)

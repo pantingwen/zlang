@@ -6,12 +6,12 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"z/parser"
-	"z/lexer"
-	"z/object"
+	"time"
 	"z/ast"
 	"z/build"
-	"time"
+	"z/lexer"
+	"z/object"
+	"z/parser"
 )
 
 func BuildSourceCode(sourceCode string, sourceFile string) {
@@ -31,14 +31,14 @@ func parseAstToC(sourceCode string) string {
 	p := parser.New(l)
 	program := p.ParseProgram()
 	env := object.NewEnvironment()
-	compiledCode := generateProgram(program, env);
+	compiledCode := generateProgram(program, env)
 	return compiledCode
 }
 
 func generateCode(node ast.Node, env *object.Environment) string {
 	switch node := node.(type) {
 	case *ast.Program:
-		return generateProgram(node, env);
+		return generateProgram(node, env)
 	case *ast.LetStatement:
 		return generateLetCode(node, env)
 	case *ast.StringLiteral:
@@ -46,7 +46,7 @@ func generateCode(node ast.Node, env *object.Environment) string {
 	case *ast.CallExpression:
 		fmt.Println("call")
 		functionName := generateCode(node.Function, env)
-		var callString string;
+		var callString string
 		callString += functionName + "("
 		for _, param := range node.Arguments {
 			paramName := generateCode(param, env)
@@ -65,15 +65,15 @@ func generateCode(node ast.Node, env *object.Environment) string {
 	}
 }
 
-func generateLetCode(node *ast.LetStatement, env *object.Environment) string{
+func generateLetCode(node *ast.LetStatement, env *object.Environment) string {
 	code := generateCode(node.Value, env)
 	retCode := "char " + node.Name.Value + "[]=\"" + code + "\";"
 	return retCode
 }
 
 func generateProgram(program *ast.Program, env *object.Environment) string {
-	var generateCompiledCode string;
-	var compiledCode string;
+	var generateCompiledCode string
+	var compiledCode string
 	for _, statement := range program.Statements {
 		code := build.Eval(statement, env)
 		compiledCode = compiledCode + code
@@ -84,11 +84,11 @@ func generateProgram(program *ast.Program, env *object.Environment) string {
 	generateCompiledCode += "int main() {\n"
 	generateCompiledCode += compiledCode + "\n"
 	generateCompiledCode += "}\n"
-	return generateCompiledCode;
+	return generateCompiledCode
 }
 
 func compileC(code string, outFile string) {
-	tempFileName := "./temp.c";
+	tempFileName := "./temp.c"
 	file, err := os.Create(tempFileName)
 	if err != nil {
 		panic(err)

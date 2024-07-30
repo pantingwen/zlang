@@ -11,6 +11,8 @@ import (
 	"z/token"
 )
 
+var runSourceDir = ""
+
 type (
 	prefixParseFn func() ast.Expression
 	infixPasrseFn func(ast.Expression) ast.Expression
@@ -124,13 +126,16 @@ func (p *Parser) ParseProgram() *ast.Program {
 }
 
 func (p *Parser) parseImportFile(program *ast.Program, fileName string) {
+	if runSourceDir != "" {
+		fileName = runSourceDir + "/" + fileName
+	}
 	if _, err := os.Stat(fileName); err != nil {
 		if os.IsNotExist(err) {
 			fmt.Println("import file not exists: " + fileName)
 			os.Exit(1)
 		}
 	}
-	importCode, err := os.ReadFile(p.peekToken.Literal)
+	importCode, err := os.ReadFile(fileName)
 	if err != nil {
 		panic(err)
 	}
@@ -509,4 +514,8 @@ func (p *Parser) curPrecedence() int {
 		return p
 	}
 	return LOWEST
+}
+
+func (p *Parser) SetRunSourceDir(sourceDir string) {
+	runSourceDir = sourceDir
 }
