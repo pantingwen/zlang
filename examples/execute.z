@@ -1,0 +1,4 @@
+let result = execute("ls -all")
+puts("ls is", result, "\n")
+
+puts("pwd is", execute("pwd"), "\n")

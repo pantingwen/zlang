@@ -1,6 +1,10 @@
 package object
 
-import "fmt"
+import (
+	"fmt"
+	"os/exec"
+	"strings"
+)
 
 var Builtins = []struct {
 	Name    string
@@ -27,7 +31,7 @@ var Builtins = []struct {
 		&Builtin{Fn: func(args ...Object) Object {
 			for _, arg := range args {
 				if arg.Inspect() == "\\n" {
-					fmt.Println();
+					fmt.Println()
 				} else {
 					fmt.Print(arg.Inspect())
 				}
@@ -106,6 +110,29 @@ var Builtins = []struct {
 			copy(newElements, arr.Elements)
 			newElements[length] = args[1]
 			return &Array{Elements: newElements}
+		}},
+	},
+	{
+		"execute",
+		&Builtin{Fn: func(args ...Object) Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got=%d, want=1", len(args))
+			}
+
+			if args[0].Type() != STRING_OBJ {
+				return newError("argument to `push` must be ARRAY, got=%s", args[0].Type())
+			}
+			str := args[0].(*String).Value
+
+			commands := strings.Fields(str)
+			cmd := exec.Command(commands[0], commands[1:]...)
+			stdout, err := cmd.Output()
+
+			if err != nil {
+				fmt.Println(err.Error())
+				return nil
+			}
+			return &String{Value: string(stdout)}
 		}},
 	},
 }
