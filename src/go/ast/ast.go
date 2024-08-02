@@ -377,3 +377,25 @@ func (we *WhileExpression) String() string {
 	out.WriteString(we.Body.String())
 	return out.String()
 }
+
+type HashAssignExpress struct {
+	Token token.Token
+	Hash  Identifier
+	Index Expression
+	Value Expression
+}
+
+func (hae *HashAssignExpress) expressionNode()      {}
+func (hae *HashAssignExpress) TokenLiteral() string { return hae.Token.Literal }
+func (hae *HashAssignExpress) String() string {
+	var out bytes.Buffer
+	out.WriteString("(")
+	out.WriteString(hae.Hash.String())
+	out.WriteString("[")
+	out.WriteString(hae.Index.String())
+	out.WriteString("]")
+	out.WriteString("=")
+	out.WriteString(hae.Value.String())
+	out.WriteString(")")
+	return out.String()
+}

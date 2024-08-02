@@ -142,9 +142,7 @@ func (p *Parser) parseImportFile(program *ast.Program, fileName string) {
 	importLexer := lexer.New(string(importCode))
 	importParser := New(importLexer)
 	importProgram := importParser.ParseProgram()
-	for _, stmt := range importProgram.Statements {
-		program.Statements = append(program.Statements, stmt)
-	}
+	program.Statements = append(program.Statements, importProgram.Statements...)
 }
 
 func (p *Parser) parseStatement() ast.Statement {
@@ -230,8 +228,31 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 func (p *Parser) parseInditifier() ast.Expression {
 	identifier := &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 	if !p.peekTokenIs(token.ASSIGN) {
-		return identifier
+		if !p.peekTokenIs(token.LBRACKET) {
+			return identifier
+		}
+		return p.parseAssignHashExpress(identifier)
 	}
+	return p.parseAssignIdentifierExpress(identifier)
+}
+
+func (p *Parser) parseAssignHashExpress(identifier *ast.Identifier) ast.Expression {
+	p.nextToken()
+	p.nextToken()
+	index := p.parseExpression(LOWEST)
+	p.nextToken()
+	if !p.expectPeek(token.ASSIGN) {
+		exp := &ast.IndexExpression{Token: identifier.Token, Left: identifier}
+		exp.Index = index
+		return exp
+	}
+	p.nextToken()
+	value := p.parseExpression(LOWEST)
+	stmt := &ast.HashAssignExpress{Token: p.curToken, Hash: *identifier, Index: index, Value: value}
+	return stmt
+}
+
+func (p *Parser) parseAssignIdentifierExpress(identifier *ast.Identifier) ast.Expression {
 	stmt := &ast.AssignExpression{Token: p.curToken, Name: identifier}
 	p.nextToken()
 	p.nextToken()

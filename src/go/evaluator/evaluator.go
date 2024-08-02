@@ -100,12 +100,31 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	case *ast.HashLiteral:
 		return evalHashLiteral(node, env)
 	case *ast.AssignExpression:
-		val := Eval(node.Value, env)
 		_, ok := env.Get(node.Name.Value)
 		if !ok {
 			return newError("variable " + node.Name.Value + " not found")
 		}
+		val := Eval(node.Value, env)
 		env.Set(node.Name.Value, val)
+		return val
+	case *ast.HashAssignExpress:
+		hashObject, ok := env.Get(node.Hash.Value)
+		if !ok {
+			return newError("hash variable " + node.Hash.Value + " not found")
+		}
+		index := Eval(node.Index, env)
+		val := Eval(node.Value, env)
+		hash, ok := hashObject.(*object.Hash)
+		if !ok {
+			return newError("object is not hash")
+		}
+		hashKey, ok := index.(object.Hashable)
+		if !ok {
+			return newError("unusable as hash key: %s,", index.Type())
+		}
+		hashed := hashKey.HashKey()
+		hash.Pairs[hashed] = object.HashPair{Key: index, Value: val}
+
 		return val
 	}
 	return nil
@@ -221,7 +240,7 @@ func evalIfExpression(ie *ast.IfExpression, env *object.Environment) object.Obje
 	condition := Eval(ie.Condition, env)
 
 	if isError(condition) {
-		//return condition
+		return condition
 	}
 
 	if isTruthy(condition) {
@@ -236,6 +255,7 @@ func evalIfExpression(ie *ast.IfExpression, env *object.Environment) object.Obje
 func evalWhileExpression(we *ast.WhileExpression, env *object.Environment) object.Object {
 	condition := Eval(we.Condition, env)
 	if isError(condition) {
+		return condition
 	}
 
 	for isTruthy(condition) {

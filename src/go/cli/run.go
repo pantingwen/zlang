@@ -31,6 +31,10 @@ func RunSourceCode(sourceCode string, mode string, fileName string) {
 		}
 	} else {
 		env := object.NewEnvironment()
-		evaluator.Eval(program, env)
+		result := evaluator.Eval(program, env)
+		_, ok := result.(*object.Error)
+		if ok {
+			fmt.Println(result)
+		}
 	}
 }

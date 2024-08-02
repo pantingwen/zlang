@@ -7,3 +7,10 @@ let person = {
 puts("person:", person["name"], "\n")
 puts("age:", person["age"], "\n")
 puts("age:", person["sex"], "\n")
+
+let dog = {
+  "name": "dfdf"
+}
+dog["name"] = "xxx"
+puts(dog, "\n");
+puts(dog["name"], "\n")
