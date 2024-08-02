@@ -1,0 +1,13 @@
+let sql = "select 1 from user"
+let config = "user:123456@locahost/test"
+// let result = mysql_query("insert into user value('xx')")
+let result = mysql_query("select id,name,age from users");
+let result_len = len(result)
+let i = 0
+while (i < result_len) {
+  puts(i)
+  puts(result[i], " ")
+  puts(len(result[i]))
+  puts("\n")
+  i = i + 1
+}

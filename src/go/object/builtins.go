@@ -1,11 +1,17 @@
 package object
 
 import (
+	"database/sql"
 	"fmt"
+	"log"
 	"os/exec"
+	"strconv"
 	"strings"
+
+	"github.com/go-sql-driver/mysql"
 )
 
+var db *sql.DB
 var Builtins = []struct {
 	Name    string
 	Builtin *Builtin
@@ -135,6 +141,101 @@ var Builtins = []struct {
 			return &String{Value: string(stdout)}
 		}},
 	},
+	{
+		"mysql_init",
+		&Builtin{Fn: func(args ...Object) Object {
+			if args[0].Type() != STRING_OBJ {
+				return newError("argument 1 to `mysql_init` must be String, got=%s", args[0].Type())
+			}
+			server := args[0].(*String).Value
+			if args[1].Type() != STRING_OBJ {
+				return newError("argument 2 to `mysql_init` must be String, got=%s", args[0].Type())
+			}
+			user := args[1].(*String).Value
+			if args[2].Type() != STRING_OBJ {
+				return newError("argument 3 to `mysql_init` must be String, got=%s", args[0].Type())
+			}
+			password := args[2].(*String).Value
+			if args[3].Type() != STRING_OBJ {
+				return newError("argument 4 to `mysql_init` must be String, got=%s", args[0].Type())
+			}
+			database := args[3].(*String).Value
+			cfg := mysql.Config{
+				User:   user,
+				Passwd: password,
+				Net:    "tcp",
+				Addr:   server,
+				DBName: database,
+			}
+			dsn := cfg.FormatDSN()
+			dsn = strings.Replace(dsn, "allowNativePasswords=false", "allowNativePasswords=true", 1)
+			db, _ = sql.Open("mysql", dsn)
+			pingErr := db.Ping()
+			if pingErr != nil {
+				log.Fatal(pingErr)
+			}
+			return nil
+		}},
+	},
+	{
+		"mysql_query",
+		&Builtin{Fn: func(args ...Object) Object {
+			sql := args[0].(*String).Value
+			rows, _ := db.Query(sql)
+			result := Array{}
+			columns, _ := rows.Columns()
+			count := len(columns)
+			values := make([]interface{}, count)
+			valuePtrs := make([]interface{}, count)
+			rowNames := Array{}
+			for _, name := range columns {
+				rowName := String{}
+				rowName.Value = name
+				rowNames.Elements = append(rowNames.Elements, Object(&rowName))
+			}
+			result.Elements = append(result.Elements, Object(&rowNames))
+			for rows.Next() {
+				for i := range columns {
+					valuePtrs[i] = &values[i]
+				}
+				err := rows.Scan(valuePtrs...)
+				if err != nil {
+					panic(err)
+				}
+				row := Array{}
+				for i := range columns {
+					val := values[i]
+
+					b, ok := val.([]byte)
+					var v string
+					if ok {
+						v = string(b)
+					}
+					ui, ok := val.([]uint8)
+					if ok {
+						v = B2S(ui)
+					}
+					i64, ok := val.(int64)
+					if ok {
+						v = strconv.FormatInt(i64, 10)
+					}
+					value := String{}
+					value.Value = v
+					row.Elements = append(row.Elements, Object(&value))
+				}
+				result.Elements = append(result.Elements, Object(&row))
+			}
+			return &result
+		}},
+	},
+}
+
+func B2S(bs []uint8) string {
+	ba := []byte{}
+	for _, b := range bs {
+		ba = append(ba, byte(b))
+	}
+	return string(ba)
 }
 
 func GetBuiltinByName(name string) *Builtin {
