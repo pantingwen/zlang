@@ -30,8 +30,3 @@ let mysql_select_one = fn(sql) {
     return [];
   }
 }
-
-mysql_init("127.0.0.1:3306", "root", "123456", "test")
-let sql = "select * from users"
-let result = mysql_select_one(sql)
-puts(result)
