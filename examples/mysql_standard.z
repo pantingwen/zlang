@@ -1,7 +1,7 @@
 import "../standard/mysql.z"
 
 mysql_init("127.0.0.1:3306", "root", "123456", "test")
-let sql = "select * from users"
-let result = mysql_select_one(sql)
+let sql = "select * from users where 1=2"
+let result = mysql_select(sql)
 puts(result, "\n")
-puts("name is:", result["name"], "\n")
+//puts("name is:", result[0], "\n")

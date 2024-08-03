@@ -1,6 +1,10 @@
 package lexer
 
-import "z/token"
+import (
+	"z/token"
+)
+
+var preToken token.Token
 
 type Lexer struct {
 	input       string // 输入的字符串
@@ -68,12 +72,12 @@ func (l *Lexer) NextToken() token.Token {
 	case '*':
 		tok = newToken(token.ASTERISK, l.ch)
 	case '/':
-		if l.peekChar() == '/'  {
+		if l.peekChar() == '/' {
 			l.readChar()
 			for { // single line anntation
 				l.readChar()
 				ch := l.ch
-				if (ch == 10) {
+				if ch == 10 {
 					return l.NextToken()
 				}
 			}
@@ -82,12 +86,12 @@ func (l *Lexer) NextToken() token.Token {
 			for {
 				l.readChar()
 				ch := l.ch
-				if (ch == '*' && l.peekChar() == '/') {
+				if ch == '*' && l.peekChar() == '/' {
 					l.readChar() // use readChar twice lose */ char
 					l.readChar()
 					return l.NextToken()
 				}
-				if (ch == 0) { // find */ until the last of file
+				if ch == 0 { // find */ until the last of file
 					l.readChar()
 					return l.NextToken()
 				}
@@ -96,17 +100,17 @@ func (l *Lexer) NextToken() token.Token {
 			tok = newToken(token.SLASH, l.ch)
 		}
 	case '<':
-		if (l.peekChar() == '=') {
+		if l.peekChar() == '=' {
 			tok.Type = token.LE
-			tok.Literal = l.input[l.position:l.position + 2]
+			tok.Literal = l.input[l.position : l.position+2]
 			l.readChar()
 		} else {
 			tok = newToken(token.LT, l.ch)
 		}
 	case '>':
-		if (l.peekChar() == '=') {
+		if l.peekChar() == '=' {
 			tok.Type = token.GE
-			tok.Literal = l.input[l.position:l.position + 2]
+			tok.Literal = l.input[l.position : l.position+2]
 			l.readChar()
 		} else {
 			tok = newToken(token.GT, l.ch)
@@ -123,6 +127,14 @@ func (l *Lexer) NextToken() token.Token {
 	case '"':
 		tok.Type = token.STRING
 		tok.Literal = l.readString()
+	case '\n': // replace \n with ;
+		if preToken.Literal != ";" && preToken.Literal != "{" && preToken.Literal != "}" {
+			tok.Type = token.SEMICOLON
+			tok.Literal = ";"
+		} else {
+			l.readChar()
+			return l.NextToken()
+		}
 	default:
 		if isLetter(l.ch) {
 			tok.Literal = l.readIndentifier()
@@ -138,6 +150,7 @@ func (l *Lexer) NextToken() token.Token {
 	}
 
 	l.readChar()
+	preToken = tok
 	return tok
 }
 
@@ -165,8 +178,8 @@ func (l *Lexer) skipWhiteSpace() {
 	}
 }
 
-func (l *Lexer) isWhiteSpace(ch byte) bool{
-	return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r'
+func (l *Lexer) isWhiteSpace(ch byte) bool {
+	return ch == ' ' || ch == '\t' || ch == '\r'
 }
 
 func (l *Lexer) readNumber() string {

@@ -39,6 +39,7 @@ import "package/include_file.z";
 <=;
 while (2 > 1) {x};
 a = b + 1;
+return []
 `
 
 	tests := []struct {
@@ -156,6 +157,10 @@ a = b + 1;
 		{token.IDENT, "b"},
 		{token.PLUS, "+"},
 		{token.INT, "1"},
+		{token.SEMICOLON, ";"},
+		{token.RETURN, "return"},
+		{token.LBRACKET, "["},
+		{token.RBRACKET, "]"},
 		{token.SEMICOLON, ";"},
 		{token.EOF, ""},
 	}

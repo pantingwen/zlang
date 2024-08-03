@@ -1,5 +1,5 @@
 let mysql_select = fn(sql) {
-  let result = mysql_query("select id,name,age from users where 1=1");
+  let result = mysql_query(sql)
   if (len(result) > 1) {
     let column = result[0]
     let len_result = len(result)
@@ -16,10 +16,10 @@ let mysql_select = fn(sql) {
       }
       res = push(res, item)
     }
-
     return res;
+  } else {
+    return []
   }
-  return [];
 } 
 
 let mysql_select_one = fn(sql) {
@@ -27,6 +27,6 @@ let mysql_select_one = fn(sql) {
   if (len(result) > 0) {
     return result[0]
   } else {
-    return [];
+    return []
   }
 }
