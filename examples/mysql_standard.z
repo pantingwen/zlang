@@ -5,3 +5,8 @@ let sql = "select * from users where 1=1"
 let result = mysql_select(sql)
 puts(result, "\n")
 puts("name is:", result[0], "\n")
+
+
+sql = "select * from users where 1=1 limit 1"
+let result_one = mysql_select_one(sql)
+puts(result_one, "\n")
