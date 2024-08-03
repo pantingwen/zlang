@@ -16,7 +16,7 @@ let mysql_select = fn(sql) {
       }
       res = push(res, item)
     }
-    return res;
+    return res
   } else {
     return []
   }

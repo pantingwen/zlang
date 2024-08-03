@@ -477,7 +477,7 @@ func (p *Parser) parseHashLiteral() ast.Expression {
 		p.nextToken()
 		value := p.parseExpression(LOWEST)
 		hash.Pairs[key] = value
-		if !p.peekTokenIs(token.RBRACE) && !p.expectPeek(token.COMMA) {
+		if !p.peekTokenIs(token.RBRACE) && !p.expectPeek(token.COMMA) && !p.expectPeek(token.SEMICOLON) {
 			return nil
 		}
 	}
