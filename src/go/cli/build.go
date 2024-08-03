@@ -35,42 +35,6 @@ func parseAstToC(sourceCode string) string {
 	return compiledCode
 }
 
-func generateCode(node ast.Node, env *object.Environment) string {
-	switch node := node.(type) {
-	case *ast.Program:
-		return generateProgram(node, env)
-	case *ast.LetStatement:
-		return generateLetCode(node, env)
-	case *ast.StringLiteral:
-		return node.Value
-	case *ast.CallExpression:
-		fmt.Println("call")
-		functionName := generateCode(node.Function, env)
-		var callString string
-		callString += functionName + "("
-		for _, param := range node.Arguments {
-			paramName := generateCode(param, env)
-			callString += paramName
-		}
-		callString += ");\n"
-		return callString
-	case *ast.FunctionLiteral:
-		return node.Name
-	case *ast.Identifier:
-		return node.Value
-	case *ast.InfixExpression:
-		return "xx"
-	default:
-		return "default" + node.TokenLiteral()
-	}
-}
-
-func generateLetCode(node *ast.LetStatement, env *object.Environment) string {
-	code := generateCode(node.Value, env)
-	retCode := "char " + node.Name.Value + "[]=\"" + code + "\";"
-	return retCode
-}
-
 func generateProgram(program *ast.Program, env *object.Environment) string {
 	var generateCompiledCode string
 	var compiledCode string
@@ -93,7 +57,7 @@ func compileC(code string, outFile string) {
 	if err != nil {
 		panic(err)
 	}
-	_, err = file.WriteString(code)
+	_, _ = file.WriteString(code)
 	file.Close()
 	cmd := exec.Command("gcc", tempFileName, "-o", outFile)
 	_, err = cmd.Output()
