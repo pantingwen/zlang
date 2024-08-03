@@ -1,11 +1,19 @@
+import "../standard/mysql.z"
 let rootFn = fn(request) {
   return "this is root"
 }
 let helloFn = fn(request) {
   return "hello"
 }
+mysql_init("127.0.0.1:3306", "root", "123456", "test")
+let mysqlFn = fn(request) {
+  let sql = "select * from users"
+  let result = mysql_select_one(sql)
+  return result;
+}
 let routes = {
   "/": rootFn,
-  "/hello": helloFn
+  "/hello": helloFn,
+  "/mysql": mysqlFn,
 }
 http_server("127.0.0.1:8080", routes)
