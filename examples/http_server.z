@@ -1,0 +1,11 @@
+let rootFn = fn(request) {
+  return "this is root"
+}
+let helloFn = fn(request) {
+  return "hello"
+}
+let routes = {
+  "/": rootFn,
+  "/hello": helloFn
+}
+http_server("127.0.0.1:8080", routes)

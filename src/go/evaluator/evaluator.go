@@ -7,9 +7,10 @@ import (
 )
 
 var (
-	NULL  = &object.Null{}
-	TRUE  = &object.Boolean{Value: true}
-	FALSE = &object.Boolean{Value: false}
+	NULL      = &object.Null{}
+	TRUE      = &object.Boolean{Value: true}
+	FALSE     = &object.Boolean{Value: false}
+	initedEnv object.Environment
 )
 
 func isError(obj object.Object) bool {
@@ -22,6 +23,7 @@ func isError(obj object.Object) bool {
 func Eval(node ast.Node, env *object.Environment) object.Object {
 	switch node := node.(type) {
 	case *ast.Program:
+		initedEnv = *env
 		return evalProgram(node, env)
 	case *ast.ExpressionStatement:
 		return Eval(node.Expression, env)
@@ -390,6 +392,9 @@ func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object
 
 	if builtin, ok := builtins[node.Value]; ok {
 		return builtin
+	}
+	if node.Value == "http_server" {
+		return init_builtin_http_server()
 	}
 	if !ok {
 		return newError("identifier not found:%s", node.Value)
