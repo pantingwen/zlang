@@ -9,11 +9,22 @@ mysql_init("127.0.0.1:3306", "root", "123456", "test")
 let mysqlFn = fn(request) {
   let sql = "select * from users"
   let result = mysql_select_one(sql)
-  return result;
+  let ret = {
+    "code": 0,
+    "msg": "ok",
+    "data": result
+  }
+  return ret;
 }
 let routes = {
   "/": rootFn,
   "/hello": helloFn,
   "/mysql": mysqlFn,
+  "/json": {
+    "fn": mysqlFn,
+    "cfg": {
+      "Content-Type": "application/json"
+    }
+  }, 
 }
 http_server("127.0.0.1:8080", routes)

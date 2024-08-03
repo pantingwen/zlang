@@ -11,6 +11,7 @@ import (
 )
 
 var httpServerRoutes map[string]*object.Function
+var httpServerConfigs map[string]map[string]string
 
 func doHttpServe(w http.ResponseWriter, r *http.Request) {
 	t := time.Now()
@@ -20,6 +21,13 @@ func doHttpServe(w http.ResponseWriter, r *http.Request) {
 	function, ok := httpServerRoutes[path]
 	if ok {
 		result := Eval(function.Body, &initedEnv)
+		routeConfig, ok := httpServerConfigs[path]
+		if ok {
+			contentType, ok := routeConfig["Content-Type"]
+			if ok {
+				w.Header().Add("Content-Type", contentType)
+			}
+		}
 		io.WriteString(w, result.Inspect())
 	} else {
 		io.WriteString(w, "path not found")
@@ -37,6 +45,7 @@ func init_builtin_http_server() *object.Builtin {
 		}
 		routes := args[1].(*object.Hash).Pairs
 		httpServerRoutes = make(map[string]*object.Function)
+		httpServerConfigs = make(map[string]map[string]string)
 		i := 0
 		for _, route := range routes {
 			path, ok1 := route.Key.(*object.String)
@@ -44,7 +53,42 @@ func init_builtin_http_server() *object.Builtin {
 			if ok1 && ok2 {
 				httpServerRoutes[path.Value] = function
 				i++
+			} else {
+				config, ok := route.Value.(*object.Hash)
+				fmt.Println(route.Value)
+				if ok {
+					fmt.Println("is hash")
+					key := object.String{}
+					key.Value = "fn"
+					hashKey, ok := object.Object(&key).(object.Hashable)
+					if !ok {
+						return newError("unusable as hash key: %s,", key.Type())
+					}
+					hashed := hashKey.HashKey()
+					function, ok := config.Pairs[hashed].Value.(*object.Function)
+					if ok {
+						fmt.Println("add...")
+						httpServerRoutes[path.Value] = function
+					}
+					cfgKey := object.String{}
+					cfgKey.Value = "cfg"
+					cfgHashKey, ok := object.Object(&cfgKey).(object.Hashable)
+					if !ok {
+						return newError("unusable as hash key:%s,", key.Type())
+					}
+					cfgHashed := cfgHashKey.HashKey()
+					hashConfig, ok := config.Pairs[cfgHashed].Value.(*object.Hash)
+					if ok {
+
+						config := make(map[string]string, len(hashConfig.Pairs))
+						for _, pair := range hashConfig.Pairs {
+							config[pair.Key.Inspect()] = pair.Value.Inspect()
+						}
+						httpServerConfigs[path.Value] = config
+					}
+				}
 			}
+
 		}
 		fmt.Println("begin start serve, server address is:", server)
 		fmt.Println("url list as follow:")
