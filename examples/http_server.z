@@ -7,7 +7,8 @@ let helloFn = fn(request) {
 }
 mysql_init("127.0.0.1:3306", "root", "123456", "test")
 let mysqlFn = fn(request) {
-  let sql = "select * from users"
+  let id = request["get"]["id"]
+  let sql = "select * from users where id=" + id
   let result = mysql_select_one(sql)
   let ret = {
     "code": 0,

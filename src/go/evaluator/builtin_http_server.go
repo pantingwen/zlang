@@ -1,6 +1,7 @@
 package evaluator
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -18,6 +19,20 @@ func doHttpServe(w http.ResponseWriter, r *http.Request) {
 	formatedTime := t.Format("2006-01-02 15:04:05")
 	fmt.Println(formatedTime + " request url is: " + r.URL.Path)
 	path := r.URL.Path
+	fmt.Println(r.URL.Query())
+	body, _ := io.ReadAll(r.Body)
+	fmt.Println(string(body))
+
+	postJson := make(map[string]interface{})
+	err := json.Unmarshal(body, &postJson)
+	pairs := make(map[object.HashKey]object.HashPair)
+	if err == nil {
+		handlePostData(postJson, pairs)
+	}
+	handleGetData(r, pairs)
+	request := object.Hash{Pairs: pairs}
+	initedEnv.Set("request", object.Object(&request)) // pass request parameter
+
 	function, ok := httpServerRoutes[path]
 	if ok {
 		result := Eval(function.Body, &initedEnv)
@@ -32,6 +47,47 @@ func doHttpServe(w http.ResponseWriter, r *http.Request) {
 	} else {
 		io.WriteString(w, "path not found")
 	}
+}
+
+func handleGetData(r *http.Request, pairs map[object.HashKey]object.HashPair) {
+	getPirs := make(map[object.HashKey]object.HashPair)
+	for query, value := range r.URL.Query() {
+		getItemName := object.String{Value: query}
+		getItemNameHashKey, _ := object.Object(&getItemName).(object.Hashable)
+		getItemNameHashed := getItemNameHashKey.HashKey()
+		getItemValue := object.String{Value: ""}
+		if len(value) > 0 {
+			getItemValue.Value = value[0]
+		}
+		getPirs[getItemNameHashed] = object.HashPair{Key: object.Object(&getItemName), Value: object.Object(&getItemValue)}
+	}
+	getHash := object.Hash{Pairs: getPirs}
+	getName := object.String{}
+	getName.Value = "get"
+	getNameHashKey, _ := object.Object(&getName).(object.Hashable)
+	getNameHashed := getNameHashKey.HashKey()
+	pairs[getNameHashed] = object.HashPair{Key: object.Object(&getName), Value: object.Object(&getHash)}
+}
+
+func handlePostData(postJson map[string]interface{}, pairs map[object.HashKey]object.HashPair) {
+	postPirs := make(map[object.HashKey]object.HashPair)
+	for post, value := range postJson {
+		postItemName := object.String{Value: post}
+		postItemNameHashKey, _ := object.Object(&postItemName).(object.Hashable)
+		postItemNameHashed := postItemNameHashKey.HashKey()
+		postItemValue := object.String{Value: ""}
+		valueStr, ok := value.(string)
+		if ok {
+			postItemValue.Value = valueStr
+		}
+		postPirs[postItemNameHashed] = object.HashPair{Key: &postItemName, Value: &postItemValue}
+	}
+	postHash := object.Hash{Pairs: postPirs}
+	postName := object.String{}
+	postName.Value = "post"
+	postNameHashKey, _ := object.Object(&postName).(object.Hashable)
+	postNameHashed := postNameHashKey.HashKey()
+	pairs[postNameHashed] = object.HashPair{Key: &postName, Value: object.Object(&postHash)}
 }
 
 func init_builtin_http_server() *object.Builtin {
@@ -55,9 +111,7 @@ func init_builtin_http_server() *object.Builtin {
 				i++
 			} else {
 				config, ok := route.Value.(*object.Hash)
-				fmt.Println(route.Value)
 				if ok {
-					fmt.Println("is hash")
 					key := object.String{}
 					key.Value = "fn"
 					hashKey, ok := object.Object(&key).(object.Hashable)
@@ -67,7 +121,6 @@ func init_builtin_http_server() *object.Builtin {
 					hashed := hashKey.HashKey()
 					function, ok := config.Pairs[hashed].Value.(*object.Function)
 					if ok {
-						fmt.Println("add...")
 						httpServerRoutes[path.Value] = function
 					}
 					cfgKey := object.String{}
