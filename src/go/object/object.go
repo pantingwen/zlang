@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"hash/fnv"
+	"strings"
 	"z/ast"
 	"z/code"
-	"strings"
 )
 
 type ObjectType string
@@ -14,6 +14,7 @@ type ObjectType string
 type Object interface {
 	Type() ObjectType
 	Inspect() string
+	Json() string
 }
 
 const (
@@ -36,6 +37,7 @@ type Integer struct {
 }
 
 func (i *Integer) Inspect() string  { return fmt.Sprintf("%d", i.Value) }
+func (i *Integer) Json() string     { return fmt.Sprintf("%d", i.Value) }
 func (i *Integer) Type() ObjectType { return INTEGER_OBJ }
 func (i *Integer) HashKey() HashKey {
 	return HashKey{Type: i.Type(), Value: uint64(i.Value)}
@@ -46,6 +48,7 @@ type Boolean struct {
 }
 
 func (b *Boolean) Inspect() string  { return fmt.Sprintf("%t", b.Value) }
+func (b *Boolean) Json() string     { return fmt.Sprintf("%t", b.Value) }
 func (b *Boolean) Type() ObjectType { return BOOLEAN_OBJ }
 func (b *Boolean) HashKey() HashKey {
 	var value uint64
@@ -61,6 +64,7 @@ type Null struct {
 }
 
 func (n *Null) Inspect() string  { return "null" }
+func (n *Null) Json() string     { return "\"null\"" }
 func (n *Null) Type() ObjectType { return NULL_OBJ }
 
 type Error struct {
@@ -69,6 +73,7 @@ type Error struct {
 
 func (e *Error) Type() ObjectType { return ERROR_OBJ }
 func (e *Error) Inspect() string  { return "ERROR: " + e.Message }
+func (n *Error) Json() string     { return "\"error\"" }
 
 type ReturnValue struct {
 	Value Object
@@ -76,6 +81,7 @@ type ReturnValue struct {
 
 func (rv *ReturnValue) Type() ObjectType { return RETURN_VALUE_OBJ }
 func (rv *ReturnValue) Inspect() string  { return rv.Value.Inspect() }
+func (rv *ReturnValue) Json() string     { return rv.Value.Json() }
 
 type Function struct {
 	Parameters []*ast.Identifier
@@ -99,6 +105,7 @@ func (f *Function) Inspect() string {
 
 	return out.String()
 }
+func (rv *Function) Json() string { return "\"function\"" }
 
 type String struct {
 	Value string
@@ -106,6 +113,7 @@ type String struct {
 
 func (s *String) Type() ObjectType { return STRING_OBJ }
 func (s *String) Inspect() string  { return s.Value }
+func (s *String) Json() string     { return "\"" + s.Value + "\"" }
 func (s *String) HashKey() HashKey {
 	h := fnv.New64a()
 	h.Write([]byte(s.Value))
@@ -119,6 +127,7 @@ type Builtin struct {
 
 func (b *Builtin) Type() ObjectType { return BUILTIN_OBJ }
 func (b *Builtin) Inspect() string  { return "builtin function" }
+func (b *Builtin) Json() string     { return "builtin function" }
 
 type Array struct {
 	Elements []Object
@@ -131,6 +140,19 @@ func (ao *Array) Inspect() string {
 
 	for _, e := range ao.Elements {
 		elements = append(elements, e.Inspect())
+	}
+
+	out.WriteString("[")
+	out.WriteString(strings.Join(elements, ", "))
+	out.WriteString("]")
+	return out.String()
+}
+func (ao *Array) Json() string {
+	var out bytes.Buffer
+	elements := []string{}
+
+	for _, e := range ao.Elements {
+		elements = append(elements, e.Json())
 	}
 
 	out.WriteString("[")
@@ -168,6 +190,18 @@ func (h *Hash) Inspect() string {
 	return out.String()
 }
 
+func (h *Hash) Json() string {
+	var out bytes.Buffer
+	pairs := []string{}
+	for _, pair := range h.Pairs {
+		pairs = append(pairs, fmt.Sprintf("%s: %s", pair.Key.Json(), pair.Value.Json()))
+	}
+	out.WriteString("{")
+	out.WriteString(strings.Join(pairs, ", "))
+	out.WriteString("}")
+	return out.String()
+}
+
 type Hashable interface {
 	HashKey() HashKey
 }
@@ -182,6 +216,9 @@ func (cf *CompiledFunction) Type() ObjectType { return COMPILED_FUNCTION_OBJECT 
 func (cf *CompiledFunction) Inspect() string {
 	return fmt.Sprintf("CompiledFunction[%p]", cf)
 }
+func (cf *CompiledFunction) Json() string {
+	return fmt.Sprintf("CompiledFunction[%p]", cf)
+}
 
 type Closure struct {
 	Fn   *CompiledFunction
@@ -190,5 +227,8 @@ type Closure struct {
 
 func (c *Closure) Type() ObjectType { return CLOSURE_OBJ }
 func (c *Closure) Inspect() string {
+	return fmt.Sprintf("Closure[%p]", c)
+}
+func (c *Closure) Json() string {
 	return fmt.Sprintf("Closure[%p]", c)
 }

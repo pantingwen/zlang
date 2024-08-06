@@ -43,7 +43,7 @@ func doHttpServe(w http.ResponseWriter, r *http.Request) {
 				w.Header().Add("Content-Type", contentType)
 			}
 		}
-		io.WriteString(w, result.Inspect())
+		io.WriteString(w, result.Json())
 	} else {
 		io.WriteString(w, "path not found")
 	}
