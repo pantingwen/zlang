@@ -104,7 +104,7 @@ var Builtins = []struct {
 		"push",
 		&Builtin{Fn: func(args ...Object) Object {
 			if len(args) != 2 {
-				return newError("wrong number of arguments. got=%d, want=1", len(args))
+				return newError("wrong number of arguments. got=%d, want=2", len(args))
 			}
 
 			if args[0].Type() != ARRAY_OBJ {
@@ -226,6 +226,16 @@ var Builtins = []struct {
 				result.Elements = append(result.Elements, Object(&row))
 			}
 			return &result
+		}},
+	},
+	{
+		"typeof",
+		&Builtin{Fn: func(args ...Object) Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got=%d, want=1", len(args))
+			}
+			objectType := args[0].Type()
+			return &String{Value: strings.ToLower(string(objectType))}
 		}},
 	},
 }

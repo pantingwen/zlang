@@ -1,0 +1,8 @@
+import "../standard/builtin.z"
+
+let a = "hello"
+puts(typeof(a), "\n")
+
+puts(is_int(12), "\n")
+puts(is_string("hello"), "\n")
+puts(is_bool(false))

@@ -1,0 +1,15 @@
+let is_int = fn(variable) {
+  return typeof(variable) == "integer"
+}
+
+let is_string = fn(variable) {
+  return typeof(variable) == "string"
+}
+
+let is_bool = fn(variable) {
+  return typeof(variable) == "boolean"
+}
+
+let is_error = fn(variable) {
+  return typeof(variable) == "error"
+}
