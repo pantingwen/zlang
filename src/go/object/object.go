@@ -30,6 +30,7 @@ const (
 	HASH_OBJ                 = "HASH"
 	COMPILED_FUNCTION_OBJECT = "COMPILED_FUNCTION_OBJECT"
 	CLOSURE_OBJ              = "CLOSURE"
+	FLOAT_OBJ                = "FLOAT"
 )
 
 type Integer struct {
@@ -231,4 +232,15 @@ func (c *Closure) Inspect() string {
 }
 func (c *Closure) Json() string {
 	return fmt.Sprintf("Closure[%p]", c)
+}
+
+type Float struct {
+	Value float64
+}
+
+func (f *Float) Inspect() string  { return fmt.Sprintf("%f", f.Value) }
+func (f *Float) Json() string     { return fmt.Sprintf("%f", f.Value) }
+func (f *Float) Type() ObjectType { return FLOAT_OBJ }
+func (f *Float) HashKey() HashKey {
+	return HashKey{Type: f.Type(), Value: uint64(f.Value)}
 }

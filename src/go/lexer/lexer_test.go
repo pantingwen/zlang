@@ -39,7 +39,8 @@ import "package/include_file.z";
 <=;
 while (2 > 1) {x};
 a = b + 1;
-return []
+return [];
+let money = 100.98
 `
 
 	tests := []struct {
@@ -161,6 +162,11 @@ return []
 		{token.RETURN, "return"},
 		{token.LBRACKET, "["},
 		{token.RBRACKET, "]"},
+		{token.SEMICOLON, ";"},
+		{token.LET, "let"},
+		{token.IDENT, "money"},
+		{token.ASSIGN, "="},
+		{token.FLOAT, "100.98"},
 		{token.SEMICOLON, ";"},
 		{token.EOF, ""},
 	}

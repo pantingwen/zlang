@@ -141,8 +141,13 @@ func (l *Lexer) NextToken() token.Token {
 			tok.Type = token.LookIndent(tok.Literal)
 			return tok
 		} else if isDigit(l.ch) {
-			tok.Type = token.INT
-			tok.Literal = l.readNumber()
+			readNumber, isFloat := l.readNumber()
+			tok.Literal = readNumber
+			if isFloat {
+				tok.Type = token.FLOAT
+			} else {
+				tok.Type = token.INT
+			}
 			return tok
 		} else {
 			tok = newToken(token.ILIEGAL, l.ch)
@@ -182,13 +187,16 @@ func (l *Lexer) isWhiteSpace(ch byte) bool {
 	return ch == ' ' || ch == '\t' || ch == '\r'
 }
 
-func (l *Lexer) readNumber() string {
+func (l *Lexer) readNumber() (string, bool) {
 	position := l.position
-
+	isFloat := false
 	for isDigit(l.ch) {
+		if l.ch == '.' {
+			isFloat = true
+		}
 		l.readChar()
 	}
-	return l.input[position:l.position]
+	return l.input[position:l.position], isFloat
 }
 
 func (l *Lexer) readString() string {
@@ -203,7 +211,7 @@ func (l *Lexer) readString() string {
 }
 
 func isDigit(ch byte) bool {
-	return '0' <= ch && ch <= '9'
+	return ('0' <= ch && ch <= '9') || ch == '.'
 }
 
 func (l *Lexer) peekChar() byte {

@@ -815,3 +815,34 @@ func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
 
 	return true
 }
+
+func TestFloatExpression(t *testing.T) {
+	input := "123.45"
+
+	l := lexer.New(input)
+	p := New(l)
+
+	program := p.ParseProgram()
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program has not enough statements, expected 1")
+	}
+
+	stms, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statement[0] is not ExpressionStatement, got=%T", program.Statements[0])
+	}
+
+	ident, ok := stms.Expression.(*ast.FloatLiteral)
+	if !ok {
+		t.Fatalf("expression is not *ast.FloatLiteral, got %T", stms.Expression)
+	}
+
+	if ident.Value != 123.45 {
+		t.Fatalf("ident.Value is not %f, got %f", 123.45, ident.Value)
+	}
+
+	if ident.Token.Literal != "123.45" {
+		t.Fatalf("indet.Token.Literal is not %s, got %s", "123.45", ident.Token.Literal)
+	}
+}

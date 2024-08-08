@@ -43,6 +43,8 @@ const (
 	RBRACKET = "]"
 
 	COLON = ":"
+
+	FLOAT = "FLOAT"
 )
 
 type TokenType string

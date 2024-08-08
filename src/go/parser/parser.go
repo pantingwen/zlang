@@ -93,6 +93,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
 	p.registerPrefix(token.LBRACE, p.parseHashLiteral)
 	p.registerPrefix(token.WHILE, p.parseWhileExpression)
+	p.registerPrefix(token.FLOAT, p.parseFloatLiteral)
 	return p
 }
 
@@ -539,4 +540,15 @@ func (p *Parser) curPrecedence() int {
 
 func (p *Parser) SetRunSourceDir(sourceDir string) {
 	runSourceDir = sourceDir
+}
+
+func (p *Parser) parseFloatLiteral() ast.Expression {
+	lit := &ast.FloatLiteral{Token: p.curToken}
+	value, err := strconv.ParseFloat(p.curToken.Literal, 64)
+	if err != nil {
+		msg := fmt.Sprintf("could not parse %q as float", p.curToken.Literal)
+		p.errors = append(p.errors, msg)
+	}
+	lit.Value = value
+	return lit
 }

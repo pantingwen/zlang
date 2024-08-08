@@ -2,7 +2,6 @@ package ast
 
 import (
 	"bytes"
-	"fmt"
 	"strings"
 	"z/token"
 )
@@ -224,7 +223,7 @@ func (fl *FunctionLiteral) String() string {
 	}
 	out.WriteString(fl.TokenLiteral())
 	if fl.Name != "" {
-		out.WriteString(fmt.Sprintf("%s", fl.Name))
+		out.WriteString(fl.Name)
 	}
 	out.WriteString("(")
 	out.WriteString(strings.Join(params, ", "))
@@ -399,3 +398,12 @@ func (hae *HashAssignExpress) String() string {
 	out.WriteString(")")
 	return out.String()
 }
+
+type FloatLiteral struct {
+	Token token.Token
+	Value float64
+}
+
+func (fl *FloatLiteral) expressionNode()      {}
+func (fl *FloatLiteral) TokenLiteral() string { return fl.Token.Literal }
+func (fl *FloatLiteral) String() string       { return fl.Token.Literal }
