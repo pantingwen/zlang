@@ -15,7 +15,7 @@ let mysqlFn = fn(request) {
     "msg": "ok",
     "data": result
   }
-  return ret;
+  return ret
 }
 let routes = {
   "/": rootFn,

@@ -3,11 +3,11 @@ let fibonacci = fn(x) {
 		0
 	} else {
 		if (x == 1) {
-			return 1;
+			return 1
 		} else {
-			fibonacci(x - 1) + fibonacci(x - 2);
+			fibonacci(x - 1) + fibonacci(x - 2)
 		}
 	}
-};
-let result = fibonacci(10);
-puts("result is:", result, "\n");
+}
+let result = fibonacci(10)
+puts("result is:", result, "\n")
