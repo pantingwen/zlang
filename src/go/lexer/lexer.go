@@ -128,7 +128,7 @@ func (l *Lexer) NextToken() token.Token {
 		tok.Type = token.STRING
 		tok.Literal = l.readString()
 	case '\n': // replace \n with ;
-		if preToken.Literal != ";" && preToken.Literal != "{" && preToken.Literal != "}" && preToken.Literal != "," {
+		if preToken.Literal != ";" && preToken.Literal != "{" && preToken.Literal != "," {
 			tok.Type = token.SEMICOLON
 			tok.Literal = ";"
 		} else {
@@ -139,6 +139,7 @@ func (l *Lexer) NextToken() token.Token {
 		if isLetter(l.ch) {
 			tok.Literal = l.readIndentifier()
 			tok.Type = token.LookIndent(tok.Literal)
+			preToken = tok
 			return tok
 		} else if isDigit(l.ch) {
 			readNumber, isFloat := l.readNumber()

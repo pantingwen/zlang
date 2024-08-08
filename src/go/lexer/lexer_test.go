@@ -9,37 +9,37 @@ import (
 )
 
 func TestNextToken(t *testing.T) {
-	input := `let five = 5;
-let ten = 10;
+	input := `let five = 5
+let ten = 10
 
 let add = fn(x, y) {
-    x + y;
-};
-
-let result = add(five, ten);
-!-*/5;
-5 < 10 > 5;
-
-if (5  < 10) {
-    return true;
-} else {
-    return false;
+  x + y
 }
 
+let result = add(five, ten)
+!-*/5
+5 < 10 > 5
+
+if (5  < 10) {
+  return true
+} else {
+  return false
+};
+
 10 == 10;
-10 != 9;
-"foobar";
-"foo bar";
-[1, 2];
-{"foo": "bar"};
+10 != 9
+"foobar"
+"foo bar"
+[1, 2]
+{"foo": "bar"}
 /* annotation */
 // this is annotation
-import "package/include_file.z";
->=;
-<=;
-while (2 > 1) {x};
-a = b + 1;
-return [];
+import "package/include_file.z"
+>=
+<=
+while (2 > 1) {x}
+a = b + 1
+return []
 let money = 100.98
 `
 
@@ -112,6 +112,7 @@ let money = 100.98
 		{token.FALSE, "false"},
 		{token.SEMICOLON, ";"},
 		{token.RBRACE, "}"},
+		{token.SEMICOLON, ";"},
 		{token.INT, "10"},
 		{token.EQ, "=="},
 		{token.INT, "10"},
