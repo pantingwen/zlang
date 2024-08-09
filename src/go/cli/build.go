@@ -65,6 +65,6 @@ func compileC(code string, outFile string) {
 		fmt.Println(err.Error())
 	} else {
 		fmt.Println("build success!")
+		os.Remove(tempFileName)
 	}
-	os.Remove(tempFileName)
 }
